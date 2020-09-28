@@ -23,7 +23,10 @@ export class CrudUser {
 
   static findAll(req: Request, res: Response) {
     user
-      .findAll({ include: ["tbl_role", "tbl_subscription"] })
+      .findAndCountAll({
+        include: ["tbl_role", "tbl_subscription"],
+        order: ["use_id"],
+      })
       .then((data) => {
         res.send(data);
       })
@@ -47,17 +50,29 @@ export class CrudUser {
       });
       return;
     }
-
-    user
-      .create(req.body)
+    const x = CrudUser.findQuery(req.body.use_email)
       .then((data) => {
-        res.send(data);
+        console.log(data.rows.length);
+        if (data.rows.length > 0) {
+          res.send({ message: "El Usuario Ya se encuentra Registrado" });
+        } else {
+          user
+            .create(req.body)
+            .then((data) => {
+              res.send(data);
+            })
+            .catch((err) => {
+              res.status(500).send({
+                message:
+                  err.message ||
+                  "Some error occurred while creating the suscription.",
+              });
+            });
+        }
       })
       .catch((err) => {
         res.status(500).send({
-          message:
-            err.message ||
-            "Some error occurred while creating the suscription.",
+          message: err.message || "Internal Server Error",
         });
       });
   }
@@ -107,13 +122,8 @@ export class CrudUser {
   }
 
   static findQuery(email: any) {
-    user
-      .findAll({ where: { use_email: { [Op.eq]: email } } })
-      .then((data) => {
-        return data;
-      })
-      .catch((err) => {
-        return 0;
-      });
+    return user.findAndCountAll({
+      where: { use_email: { [Op.eq]: email }, is_valid: true },
+    });
   }
 }

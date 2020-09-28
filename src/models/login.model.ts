@@ -7,7 +7,7 @@ export function Modellogin(sequealize: Sequelize) {
       autoIncrement: true,
       primaryKey: true,
     },
-    cre_password: {
+    use_password: {
       type: DataTypes.STRING,
       allowNull: false,
     },

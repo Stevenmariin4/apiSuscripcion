@@ -23,7 +23,7 @@ export class CrudSuscription {
 
   static findAll(req: Request, res: Response) {
     suscription
-      .findAll()
+      .findAndCountAll()
       .then((data) => {
         res.send(data);
       })

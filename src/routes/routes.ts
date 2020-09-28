@@ -28,4 +28,5 @@ router.delete("/delete/usuario/:id", CrudUser.delete);
 
 // Login
 router.post("/login", CrudLogin.searchUser);
+router.post("/login/create", CrudLogin.create);
 export default router;

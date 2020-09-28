@@ -2,6 +2,7 @@ import { CrudUser } from "./user.controller";
 import { login, sql } from "../database/database";
 import { Request, Response } from "express";
 import { IRoleCreated } from "../interfaces/Irole.interfaces";
+import { Op } from "sequelize";
 
 export class CrudLogin {
   static findByid(req: Request, res: Response) {
@@ -22,41 +23,49 @@ export class CrudLogin {
       });
   }
 
-  static findAll(req: Request, res: Response) {
-    login
-      .findAll()
-      .then((data) => {
-        res.send(data);
-      })
-      .catch((err) => {
-        res.status(500).send({
-          message: err.message || "Some error occurred while get the role.",
-        });
-      });
+  static findAll(id: any) {
+    return login.findAll({
+      where: { use_id: { [Op.eq]: id }, is_valid: true },
+    });
   }
 
   static create(req: Request, res: Response) {
-    if (!req.body.use_email) {
+    if (!req.body.use_email || req.body.use_password) {
       res.status(400).send({
         message: "Invalida Data",
       });
       return;
     }
     try {
-      const usuario = CrudUser.findQuery(req.body.use_email);
-      console.log(usuario);
-    } catch (err) {}
-    login
-      .create(req.body)
-      .then((data) => {
-        res.send(data);
-      })
-      .catch((err) => {
-        res.status(500).send({
-          message:
-            err.message || "Some error occurred while creating the role.",
+      CrudUser.findQuery(req.body.use_email)
+        .then((data) => {
+          console.log();
+          if (data.rows.length == 0) {
+            res.send({ message: "Usuario No Encontrado" });
+            return;
+          }
+          login
+            .create(req.body)
+            .then((data) => {
+              res.send(data);
+            })
+            .catch((err) => {
+              res.status(500).send({
+                message:
+                  err.message || "Some error occurred while creating the role.",
+              });
+            });
+        })
+        .catch((err) => {
+          res.status(500).send({
+            message: err.message || "Internal Server Error",
+          });
         });
+    } catch (err) {
+      res.status(500).send({
+        message: err.message || "Internal Server Error",
       });
+    }
   }
 
   static update(req: Request, res: Response) {
@@ -104,13 +113,32 @@ export class CrudLogin {
   }
 
   static async searchUser(req: Request, res: Response) {
-    if (!req.body.use_email) {
-      res.send({ message: "No Se Ha Enviado Email" });
+    if (!req.body.use_email || !req.body.use_password) {
+      res.send({ message: "Usuario o Clave Incorrecta" });
     }
     try {
-      const usuario = await CrudUser.findQuery(req.body.use_email);
-      console.log(usuario);
-      res.send(usuario);
+      CrudUser.findQuery(req.body.use_email)
+        .then((data: any) => {
+          if (data.rows.length == 0) {
+            res.send({ message: "Usuario o Clave Incorrecta" });
+            return;
+          }
+          const id = data.rows[0].use_id;
+          CrudLogin.findAll(id)
+            .then((data) => {
+              console.log(data.length);
+            })
+            .catch((err) => {
+              res.status(500).send({
+                message: err.message || "Internal Server Error",
+              });
+            });
+        })
+        .catch((err) => {
+          res.status(500).send({
+            message: err.message || "Internal Server Error",
+          });
+        });
     } catch (err) {
       res.status(500).send({
         message: err.message || "Internal Server Error",

@@ -23,7 +23,7 @@ export class CrudRole {
 
   static findAll(req: Request, res: Response) {
     role
-      .findAll()
+      .findAndCountAll()
       .then((data) => {
         res.send(data);
       })
