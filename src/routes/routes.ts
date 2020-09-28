@@ -2,6 +2,7 @@ import { Router } from "express";
 import { CrudRole } from "../controllers/role.controller";
 import { CrudSuscription } from "../controllers/subscription.controller";
 import { CrudUser } from "../controllers/user.controller";
+import { CrudLogin } from "../controllers/login.controller";
 const router: Router = Router();
 
 // Ruta Roles
@@ -24,4 +25,7 @@ router.get("/reader/usuario", CrudUser.findAll);
 router.get("/reader/usuario/:id", CrudUser.findByid);
 router.post("/update/usuario/:id", CrudUser.update);
 router.delete("/delete/usuario/:id", CrudUser.delete);
+
+// Login
+router.post("/login", CrudLogin.searchUser);
 export default router;

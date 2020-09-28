@@ -1,20 +1,15 @@
 import { Sequelize, DataTypes } from "sequelize";
-import { sql } from "../database/database";
 
-export function Modelrol(sequealize: Sequelize) {
-  return sequealize.define("tbl_role", {
-    ro_id: {
+export function Modellogin(sequealize: Sequelize) {
+  return sequealize.define("tbl_credentials", {
+    cre_id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-    ro_name: {
+    cre_password: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    ro_description: {
-      type: DataTypes.STRING,
-      allowNull: true,
     },
     is_valid: {
       type: DataTypes.BOOLEAN,

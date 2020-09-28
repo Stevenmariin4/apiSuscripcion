@@ -5,6 +5,8 @@ export interface IUsuario {
   use_email: string;
   use_phone: string;
   use_photo: string;
+  ro_id: number;
+  su_id: number;
 }
 
 export interface IUserCredentials {

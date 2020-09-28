@@ -1,16 +1,17 @@
-import { user, sql } from "../database/database";
+import { CrudUser } from "./user.controller";
+import { login, sql } from "../database/database";
 import { Request, Response } from "express";
-import { Op } from "sequelize";
+import { IRoleCreated } from "../interfaces/Irole.interfaces";
 
-export class CrudUser {
+export class CrudLogin {
   static findByid(req: Request, res: Response) {
     if (!req.params.id) {
       res.send(400).send({ message: "No se ha enviado un id para actualizar" });
       return;
     }
     const id = req.params.id;
-    user
-      .findByPk(id, { include: ["tbl_role", "tbl_subscription"] })
+    login
+      .findByPk(id)
       .then((data) => {
         res.send(data);
       })
@@ -22,33 +23,30 @@ export class CrudUser {
   }
 
   static findAll(req: Request, res: Response) {
-    user
-      .findAll({ include: ["tbl_role", "tbl_subscription"] })
+    login
+      .findAll()
       .then((data) => {
         res.send(data);
       })
       .catch((err) => {
         res.status(500).send({
-          message:
-            err.message || "Some error occurred while get the suscription.",
+          message: err.message || "Some error occurred while get the role.",
         });
       });
   }
 
   static create(req: Request, res: Response) {
-    if (
-      !req.body.use_name ||
-      !req.body.use_email ||
-      !req.body.ro_id ||
-      !req.body.su_id
-    ) {
+    if (!req.body.use_email) {
       res.status(400).send({
         message: "Invalida Data",
       });
       return;
     }
-
-    user
+    try {
+      const usuario = CrudUser.findQuery(req.body.use_email);
+      console.log(usuario);
+    } catch (err) {}
+    login
       .create(req.body)
       .then((data) => {
         res.send(data);
@@ -56,8 +54,7 @@ export class CrudUser {
       .catch((err) => {
         res.status(500).send({
           message:
-            err.message ||
-            "Some error occurred while creating the suscription.",
+            err.message || "Some error occurred while creating the role.",
         });
       });
   }
@@ -69,9 +66,9 @@ export class CrudUser {
     }
     const id = req.params.id;
 
-    user
+    login
       .update(req.body, {
-        where: { use_id: id },
+        where: { ro_id: id },
       })
       .then((data) => {
         res.send({ message: "Rol Actualizado Correctamente" });
@@ -89,12 +86,12 @@ export class CrudUser {
       return;
     }
     const body = {
-      is_valid: 0,
+      ro_is_valid: 0,
     };
     const id = req.params.id;
-    user
+    login
       .update(body, {
-        where: { use_id: id },
+        where: { ro_id: id },
       })
       .then((data) => {
         res.send({ message: "Rol Eliminado Correctamente" });
@@ -106,14 +103,18 @@ export class CrudUser {
       });
   }
 
-  static findQuery(email: any) {
-    user
-      .findAll({ where: { use_email: { [Op.eq]: email } } })
-      .then((data) => {
-        return data;
-      })
-      .catch((err) => {
-        return 0;
+  static async searchUser(req: Request, res: Response) {
+    if (!req.body.use_email) {
+      res.send({ message: "No Se Ha Enviado Email" });
+    }
+    try {
+      const usuario = await CrudUser.findQuery(req.body.use_email);
+      console.log(usuario);
+      res.send(usuario);
+    } catch (err) {
+      res.status(500).send({
+        message: err.message || "Internal Server Error",
       });
+    }
   }
 }
