@@ -1,4 +1,4 @@
-import { suscription, sql } from "../database/database";
+import { user, sql } from "../database/database";
 import { Request, Response } from "express";
 import { IUsuario } from "../interfaces/Iuser.interfaces";
 
@@ -9,7 +9,7 @@ export class CrudUser {
       return;
     }
     const id = req.params.id;
-    suscription
+    user
       .findByPk(id)
       .then((data) => {
         res.send(data);
@@ -22,7 +22,7 @@ export class CrudUser {
   }
 
   static findAll(req: Request, res: Response) {
-    suscription
+    user
       .findAll()
       .then((data) => {
         res.send(data);
@@ -43,7 +43,7 @@ export class CrudUser {
       return;
     }
 
-    suscription
+    user
       .create(req.body)
       .then((data) => {
         res.send(data);
@@ -64,7 +64,7 @@ export class CrudUser {
     }
     const id = req.params.id;
 
-    suscription
+    user
       .update(req.body, {
         where: { use_id: id },
       })
@@ -84,12 +84,12 @@ export class CrudUser {
       return;
     }
     const body = {
-      ro_is_valid: 0,
+      is_valid: 0,
     };
     const id = req.params.id;
-    suscription
+    user
       .update(body, {
-        where: { ro_id: id },
+        where: { use_id: id },
       })
       .then((data) => {
         res.send({ message: "Rol Eliminado Correctamente" });
