@@ -1,23 +1,26 @@
 import { DataTypes, Sequelize } from "sequelize";
-
-export function Modelrol(sequealize: Sequelize) {
-  return sequealize.define("tbl_role", {
-    ro_id: {
+export function ModelSuscripcion(sequealize: Sequelize) {
+  return sequealize.define("tbl_subscription", {
+    su_id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-    ro_name: {
+    su_name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    ro_description: {
+    su_description: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
-    is_valid:{
-      type:DataTypes.BOOLEAN,
-      allowNull:false
+    su_time: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    is_valid: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
     },
     createdAt: {
       type: DataTypes.DATE,

@@ -1,15 +1,15 @@
-import { role, sql } from "../database/database";
+import { suscription, sql } from "../database/database";
 import { Request, Response } from "express";
-import { IRoleCreated } from "../interfaces/Irole.interfaces";
+import { ISuscription } from "../interfaces/Isuscripton.interfaces";
 
-export class CrudRole {
+export class CrudSuscription {
   static findByid(req: Request, res: Response) {
     if (!req.params.id) {
       res.send(400).send({ message: "No se ha enviado un id para actualizar" });
       return;
     }
     const id = req.params.id;
-    role
+    suscription
       .findByPk(id)
       .then((data) => {
         res.send(data);
@@ -22,39 +22,42 @@ export class CrudRole {
   }
 
   static findAll(req: Request, res: Response) {
-    role
+    suscription
       .findAll()
       .then((data) => {
         res.send(data);
       })
       .catch((err) => {
         res.status(500).send({
-          message: err.message || "Some error occurred while get the role.",
+          message:
+            err.message || "Some error occurred while get the suscription.",
         });
       });
   }
 
   static create(req: Request, res: Response) {
-    if (!req.body.ro_name) {
+    if (!req.body.su_name || !req.body.su_time) {
       res.status(400).send({
         message: "Invalida Data",
       });
       return;
     }
-    const Bodyrole: IRoleCreated = {
-      ro_name: req.body.ro_name,
-      ro_description: req.body.ro_description,
-      is_valid: req.body.is_valid || 1,
+    const Bodysuscription: ISuscription = {
+      su_name: req.body.su_name,
+      su_description: req.body.su_description,
+      su_time: req.body.su_time,
+      is_valid: req.body.is_valid,
     };
-    role
-      .create(Bodyrole)
+    suscription
+      .create(Bodysuscription)
       .then((data) => {
         res.send(data);
       })
       .catch((err) => {
         res.status(500).send({
           message:
-            err.message || "Some error occurred while creating the role.",
+            err.message ||
+            "Some error occurred while creating the suscription.",
         });
       });
   }
@@ -66,9 +69,9 @@ export class CrudRole {
     }
     const id = req.params.id;
 
-    role
+    suscription
       .update(req.body, {
-        where: { ro_id: id },
+        where: { su_id: id },
       })
       .then((data) => {
         res.send({ message: "Rol Actualizado Correctamente" });
@@ -89,7 +92,7 @@ export class CrudRole {
       ro_is_valid: 0,
     };
     const id = req.params.id;
-    role
+    suscription
       .update(body, {
         where: { ro_id: id },
       })
